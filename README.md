@@ -1,6 +1,6 @@
 # Predict Customer Churn
 
-- Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
+Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
 
 ## Project Description
 The goal of this project is to identify bank customers that are likely to switch to another bank.
@@ -21,11 +21,11 @@ The program runs through five steps:
 
 ## Running Files
 You can run the whole process by executing
-    python churn_library.py
+~~~python churn_library.py~~~
 
 You can run the tests by running pytest from the root folder and
 pipe the results into a log file:
-    pytest tests/churn_library_test.py > test.log
+~~~pytest tests/churn_library_test.py > test.log~~~
 
 If you want to see the print statements add the -s flag:
-    pytest tests/churn_library_test.py -s
+~~~pytest tests/churn_library_test.py -s~~~
