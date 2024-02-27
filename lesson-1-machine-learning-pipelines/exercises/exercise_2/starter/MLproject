@@ -1,0 +1,18 @@
+name: exercise2
+conda_env: conda.yml
+entry_points:
+  main:
+    parameters:
+      file_url:
+        description: url of the file
+        type: uri
+      artifact_name:
+        description: name of te artifaact
+        type: str
+      artifact_type:
+        description: the type of the artifact
+        type: str
+      artifact_description:
+        description: describe what this artifact means
+        type: str
+    command: python download_data.py --file_url={file_url} --artifact_name={artifact_name} --artifact_type={artifact_type} --artifact_description={artifact_description}

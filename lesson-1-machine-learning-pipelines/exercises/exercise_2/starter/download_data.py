@@ -21,34 +21,48 @@ def go(args):
     # destroyed at the end of the context, so we don't leave anything
     # behind and the file gets removed even in case of errors
     logger.info(f"Downloading {args.file_url} ...")
-    with tempfile.NamedTemporaryFile(mode='wb+') as fp:
 
-        logger.info("Creating run exercise_2")
-        with wandb.init(project="exercise_2", job_type="download_data") as run:
-            # Download the file streaming and write to open temp file
-            with requests.get(args.file_url, stream=True) as r:
-                for chunk in r.iter_content(chunk_size=8192):
-                    fp.write(chunk)
+
+    #### CAVEAT: Running the project on windows does not allow the file to be opened for writing and reading it at the same time.
+    # So i do open my own temp file here and close it before doint the wandb upload stuff.
+    windows_tmpfile = ""
+    with tempfile.NamedTemporaryFile(mode='wb+') as fp:
+        windows_tmpfile = fp.name   # get a cool temp file name in a proper tmp folder
+    
+    with open(windows_tmpfile, 'wb+') as fp:
+        # Download the file streaming and write to open temp file
+        with requests.get(args.file_url, stream=True) as r:
+            for chunk in r.iter_content(chunk_size=8192):
+                fp.write(chunk)
 
             # Make sure the file has been written to disk before uploading
             # to W&B
-            fp.flush()
+        fp.flush()
 
-            logger.info("Creating artifact")
-            artifact = wandb.Artifact(
-                name=args.artifact_name,
-                type=args.artifact_type,
-                description=args.artifact_description,
-                metadata={'original_url': args.file_url}
-            )
-            artifact.add_file(fp.name, name=basename)
+    logger.info("Creating run exercise_2")
+    with wandb.init(project="exercise_2", job_type="download_data") as run:
+        logger.info("Creating artifact")
+        artifact = wandb.Artifact(
+            name=args.artifact_name,
+            type=args.artifact_type,
+            description=args.artifact_description,
+            metadata={'original_url': args.file_url}
+        )
+        artifact.add_file(windows_tmpfile, name=basename)
 
-            logger.info("Logging artifact")
-            run.log_artifact(artifact)
+        logger.info("Logging artifact")
+        run.log_artifact(artifact)
 
-            # This makes sure that the artifact is uploaded before the
-            # tempfile is destroyed
-            artifact.wait()
+        # This makes sure that the artifact is uploaded before the
+        # tempfile is destroyed
+        artifact.wait()
+
+    # Remove my own temp file:
+    import os
+    try:
+        os.remove(windows_tmpfile)
+    except OSError:
+        pass
 
 
 if __name__ == "__main__":

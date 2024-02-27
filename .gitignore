@@ -3,3 +3,5 @@
 .pytest-cache
 __pycache__
 .log
+wandb/
+mlruns/
